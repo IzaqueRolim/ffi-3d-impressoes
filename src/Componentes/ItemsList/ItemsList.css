@@ -7,3 +7,15 @@
     gap: 24px;
     padding: 0;
 }
+
+@media (max-width: 1024px) {
+  .items-list {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1025px) {
+  .items-list {
+    justify-content: space-between;
+  }
+}

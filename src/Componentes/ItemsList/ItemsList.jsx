@@ -79,7 +79,6 @@ export default function ItemsList({selectedCategory }) {
       {filteredItems.map(item => (
         <Item key={item.id} {...item} />
       ))}
-      <button onClick={loopRegister}>Registrar</button>
     </section>
   );
 
