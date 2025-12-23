@@ -1,23 +1,8 @@
 import "./NavBar.css";
 import logo from "../../assets/logo-ffi.png";
-import { collection, getDocs, query } from "firebase/firestore"; // Importe deleteDoc e doc
-import { db } from "../../firebaseConfig.js";
-
-const q = query(collection(db, "items"));
-
-const snapshot = await getDocs(q);
-const list = snapshot.docs.map((doc) => ({
-    docId: doc.id, 
-    id: doc.data().id, 
-    name:doc.data().name,
-    category:doc.data().category,
-    price:doc.data().price,
-    image:doc.data().image
-}));
-const categories = ["Todos",...new Set(list.map(item => item.category))];
-
-
-export default function NavBar({ selectedCategory, onSelectCategory }) {
+  
+export default function NavBar({items, selectedCategory, onSelectCategory }) {
+  const categories = ["Todos",...new Set(items.map(item => item.category))];
   return (
     <header className="navbar">
       <img src={logo} alt="Fantástica Fábrica" className="logo" />
