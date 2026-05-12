@@ -2,31 +2,31 @@ import { useState } from "react";
 
 function ProductForm({ onProductCreated }) {
   const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    price: "",
-    image: null,
-  });
+  name: "",
+  category: "",
+  price: "",
+  images: [],
+});
 
-  const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(false);
 
- const handleChange = (e) => {
+const handleChange = (e) => {
   const { name, value, files } = e.target;
 
-  // Se for imagem
-  if (name === "image") {
-    setFormData({
-      ...formData,
-      image: files[0],
-    });
+  // Múltiplas imagens
+  if (name === "images") {
+    setFormData((prev) => ({
+      ...prev,
+      images: Array.from(files),
+    }));
 
     return;
   }
 
-  setFormData({
-    ...formData,
+  setFormData((prev) => ({
+    ...prev,
     [name]: value,
-  });
+  }));
 };
 
 const handleSubmit = async (e) => {
@@ -35,14 +35,18 @@ const handleSubmit = async (e) => {
   setLoading(true);
 
   try {
-
-    // FormData para multipart/form-data
     const data = new FormData();
 
     data.append("name", formData.name);
     data.append("category", formData.category);
     data.append("price", formData.price);
-    data.append("image", formData.image);
+
+    // Adiciona todas as imagens
+    formData.images.forEach((image) => {
+      data.append("images", image);
+    });
+
+    console.log(data)
 
     const response = await fetch(
       "http://localhost:3001/products",
@@ -52,25 +56,29 @@ const handleSubmit = async (e) => {
       }
     );
 
+    if (!response.ok) {
+      throw new Error("Erro ao cadastrar produto");
+    }
+
     const newProduct = await response.json();
 
     onProductCreated(newProduct);
 
     alert("Produto cadastrado!");
 
-   setFormData({
-    name: "",
-    category: "",
-    price: "",
-    image: null,
+    setFormData({
+      name: "",
+      category: "",
+      price: "",
+      images: [],
     });
 
   } catch (error) {
     console.error(error);
     alert("Erro ao cadastrar produto");
+  } finally {
+    setLoading(false);
   }
-
-  setLoading(false);
 };
 
   return (
@@ -124,18 +132,20 @@ const handleSubmit = async (e) => {
         />
 
         <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleChange}
-            required
-            style={inputStyle}
-            />
-            {formData.image && (
-            <p>
-                Arquivo: {formData.image.name}
-            </p>
-            )}
+          type="file"
+          name="images"
+          multiple
+          onChange={handleChange}
+        />
+          {formData.images.length > 0 && (
+            <div>
+              {formData.images.map((image, index) => (
+                <p key={index}>
+                  Arquivo: {image.name}
+                </p>
+              ))}
+            </div>
+          )}
 
         <button
           type="submit"
